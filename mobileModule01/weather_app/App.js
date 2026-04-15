@@ -1,33 +1,54 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Pressable, TextInput, ScrollView, Dimensions } from 'react-native';
 import React, { useState } from 'react';
+import { StyleSheet, useWindowDimensions } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import { TabView } from 'react-native-tab-view';
 
-import BottomBar from './components/BottomBar';
 import TopBar from './components/TopBar';
+import BottomBar from './components/BottomBar';
 import MiddleArea from './components/MiddleArea';
 
-export default function App() {
+const tabs = [
+  { key: 'currently', title: 'Currently' },
+  { key: 'today', title: 'Today' },
+  { key: 'weekly', title: 'Weekly' },
+];
 
-  const [activeTab, setActiveTab] = useState('Currently');
+export default function App() {
+  const { width } = useWindowDimensions();
+
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const [extraText, setExtraText] = useState('');
+
+  const activeTab = tabs[selectedIndex].title;
+
+  const renderScene = ({ route }) => (
+    <MiddleArea title={route.title} extraText={extraText} />
+  );
+
+  const selectTab = (tabName) => {
+    const nextIndex = tabs.findIndex((tab) => tab.title === tabName);
+    if (nextIndex !== -1) {
+      setSelectedIndex(nextIndex);
+    }
+  };
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-    
-        <StatusBar style="auto" />
-         
-        <TopBar extraText={extraText} setExtraText={setExtraText} />    
-        
-        <MiddleArea 
-          activeTab={activeTab} 
-          setActiveTab={setActiveTab} 
-          extraText={extraText}
+
+        <TopBar extraText={extraText} setExtraText={setExtraText} />
+
+        <TabView
+          navigationState={{ index: selectedIndex, routes: tabs }}
+          renderScene={renderScene}
+          onIndexChange={setSelectedIndex}
+          initialLayout={{ width }}
+          renderTabBar={() => null}
+          style={styles.tabView}
         />
-        
-        <BottomBar activeTab={activeTab} setActiveTab={setActiveTab}/>
-      
+
+        <BottomBar activeTab={activeTab} setActiveTab={selectTab} />
+
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -37,16 +58,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#8cf0c18a',
-
+  },
+  tabView: {
+    flex: 1,
   },
 });
-
-
-// in React, a capitalized tag signals a custom component
-// one uses component functions by writing them like a tag
-// this means render the BottomBar component here
-// there is only one tag with final slash because the componennt
-// has no children inside // does not wrap inner content
-// you write in the tags the props you pass to the function
-// props are arguments you pass to the component function 
-// child - a component that lives inside another component

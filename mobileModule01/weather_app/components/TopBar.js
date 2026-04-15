@@ -1,67 +1,109 @@
 import React from 'react';
-import { View, TextInput, Pressable, Text, StyleSheet } from 'react-native';
+import {
+  View,
+  TextInput,
+  Pressable,
+  StyleSheet,
+  useWindowDimensions,
+} from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { getResponsiveSizes } from '../utils/responsive';
 
 export default function TopBar({ extraText, setExtraText }) {
+  const { width, height } = useWindowDimensions();
+  const {
+    topBarFont,
+    topBarIcon,
+    topBarPadV,
+    topBarPadH,
+    topBarRadius,
+  } = getResponsiveSizes(width, height);
 
-    return (
+  const controlHeight = topBarFont + topBarPadV * 2 + 2;
 
-        <View style={styles.topBar}>
-            <TextInput
-                style={styles.input}
-                placeholder="Search city"
-                value={extraText}
-                onChangeText={setExtraText}
-            />
+  const handleGeolocationPress = () => {
+    setExtraText('Geolocation');
+  };
 
-            <Pressable
-                style={styles.geoButton}
-                onPress={() => setExtraText('Geolocation')}
-            >
-                <Ionicons name="location-outline" size={22} color="black" />
-                <Text style={styles.buttonText}>Geo</Text>
-            </Pressable>
-        </View>
-    );
+  return (
+    <View
+      style={[
+        styles.topBar,
+        {
+          paddingHorizontal: topBarPadH,
+          paddingVertical: topBarPadV,
+        },
+      ]}
+    >
+      <View
+        style={[
+          styles.searchGroup,
+          {
+            minHeight: controlHeight,
+            borderRadius: topBarRadius,
+          },
+        ]}
+      >
+        <TextInput
+          value={extraText}
+          onChangeText={setExtraText}
+          placeholder="Search city"
+          underlineColorAndroid="transparent"
+          style={[
+            styles.input,
+            {
+              fontSize: topBarFont,
+              paddingHorizontal: topBarPadH,
+            },
+          ]}
+        />
+
+        <Pressable
+          onPress={handleGeolocationPress}
+          style={[
+            styles.geoButton,
+            {
+              width: controlHeight,
+            },
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel="Use geolocation"
+        >
+          <Ionicons
+            name="location-outline"
+            size={topBarIcon}
+            color="#444"
+          />
+        </Pressable>
+      </View>
+    </View>
+  );
 }
 
-const styles= StyleSheet.create({
-    topBar: {
-        width: '100%',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 12, 
-        paddingVertical: 10,
-        gap: 8,
-    },
-
-    input: {
-       flex: 1,
-       minWidth: 0, // allows   the input to shrink when the geo button is present    
-       backgroundColor: 'white',
-       borderWidth: 1,
-       borderColor: '#ccc',
-       borderRadius: 8, 
-       paddingHorizontal: 12,
-       paddingVertical: 10,
-    },
-
-    geoButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
-        backgroundColor: '#eee',
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        paddingHorizontal: 10,
-        paddingVertical: 10,
-    },
-
-    buttonText: {
-        fontWeight: '600',
-        marginLeft: 4,
-    },
-
-})
+const styles = StyleSheet.create({
+  topBar: {
+    width: '100%',
+    backgroundColor: '#ddd',
+  },
+  searchGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    overflow: 'hidden',
+  },
+  input: {
+    flex: 1,
+    minWidth: 0,
+    backgroundColor: 'white',
+  },
+  geoButton: {
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    borderLeftWidth: 1,
+    borderLeftColor: '#ccc',
+  },
+});
