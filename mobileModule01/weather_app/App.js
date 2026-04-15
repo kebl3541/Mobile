@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Pressable, TextInput, ScrollView, Dimensions } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+
 import BottomBar from './components/BottomBar';
 import TopBar from './components/TopBar';
 import MiddleArea from './components/MiddleArea';
@@ -10,7 +11,6 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState('Currently');
   const [extraText, setExtraText] = useState('');
-  const screenWidth = Dimensions.get('window').width;
 
   return (
     <SafeAreaProvider>

@@ -38,6 +38,7 @@ const styles= StyleSheet.create({
 
     input: {
        flex: 1,
+       minWidth: 0, // allows   the input to shrink when the geo button is present    
        backgroundColor: 'white',
        borderWidth: 1,
        borderColor: '#ccc',
@@ -60,6 +61,7 @@ const styles= StyleSheet.create({
 
     buttonText: {
         fontWeight: '600',
+        marginLeft: 4,
     },
 
 })

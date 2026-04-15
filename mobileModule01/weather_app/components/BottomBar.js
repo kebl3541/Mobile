@@ -45,11 +45,15 @@ const styles = StyleSheet.create({
     },
 
     tab: {
+        flex: 1,
         alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 6,
     },
 
     tabText: {
         fontWeight: '400',
+        textAlign: 'center',
     },
 
     activeText: {
