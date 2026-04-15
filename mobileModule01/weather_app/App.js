@@ -18,26 +18,14 @@ export default function App() {
     
         <StatusBar style="auto" />
          
-        <TopBar extraText={extraText} setExtraText={setExtraText} />
+        <TopBar extraText={extraText} setExtraText={setExtraText} />    
         
-        {/* <ScrollView horizontal pagingEnabled style={{ flex: 1 }}>
-
-              <View style={{ width: screenWidth, justifyContent: 'center', alignItems: 'center', backgroundColor: 'red' }}>
-                    <Text>{activeTab} {extraText}</Text>
-              </View>
-              
-              <View style={{ width: screenWidth, justifyContent: 'center', alignItems: 'center',  backgroundColor: 'green' }}>
-                    <Text>{activeTab} {extraText}</Text>
-              </View>
-
-              <View style={{ width: screenWidth, justifyContent: 'center', alignItems: 'center', backgroundColor: 'blue' }}>
-                    <Text>{activeTab} {extraText}</Text>
-              </View>
-
-
-        </ScrollView> */}
-    
-        <MiddleArea activeTab={activeTab} setActiveTab={setActiveTab} extraText={extraText}/>
+        <MiddleArea 
+          activeTab={activeTab} 
+          setActiveTab={setActiveTab} 
+          extraText={extraText}
+        />
+        
         <BottomBar activeTab={activeTab} setActiveTab={setActiveTab}/>
       
       </SafeAreaView>
