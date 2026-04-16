@@ -43,7 +43,7 @@ export default function App() {
           renderScene={renderScene}
           onIndexChange={setSelectedIndex}
           initialLayout={{ width }}
-          renderTabBar={() => null}
+          renderTabBar={() => null} //maybe use it
           style={styles.tabView}
         />
 
