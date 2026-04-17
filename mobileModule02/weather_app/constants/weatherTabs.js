@@ -3,8 +3,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 
 export const weatherTabs = [
   {
-    key: 'currently',
-    title: 'Currently',
+    key: 'current',
+    title: 'Current',
     icon: {
       active: 'time',
       inactive: 'time-outline',

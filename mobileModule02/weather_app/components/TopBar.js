@@ -1,9 +1,12 @@
 import React from 'react';
 import {
   View,
+  Text,
   TextInput,
   Pressable,
   StyleSheet,
+  FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
@@ -12,6 +15,11 @@ export default function TopBar({
   setInputText,
   onSubmitEditing,
   onGeolocationPress,
+  geolocationLoading,
+  suggestions,
+  onSuggestionPress,
+  showPermissionCta,
+  onPermissionPress,
   responsive,
 }) {
   const {
@@ -62,22 +70,60 @@ export default function TopBar({
 
         <Pressable
           onPress={onGeolocationPress}
+          disabled={geolocationLoading}
           style={[
             styles.geoButton,
+            geolocationLoading && styles.geoButtonDisabled,
             {
               width: controlHeight,
             },
           ]}
           accessibilityRole="button"
-          accessibilityLabel="Use geolocation"
+          accessibilityLabel={geolocationLoading ? 'Getting location' : 'Use geolocation'}
         >
-          <Ionicons
-            name="location-outline"
-            size={topBarIcon}
-            color="#444"
-          />
+          {geolocationLoading ? (
+            <ActivityIndicator size="small" color="#444" />
+          ) : (
+            <Ionicons
+              name="location-outline"
+              size={topBarIcon}
+              color="#444"
+            />
+          )}
         </Pressable>
       </View>
+
+      {suggestions.length > 0 && (
+        <View style={styles.suggestionsContainer}>
+          <FlatList
+            keyboardShouldPersistTaps="handled"
+            data={suggestions}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <Pressable
+                onPress={() => onSuggestionPress(item)}
+                style={styles.suggestionItem}
+              >
+                <Text style={styles.suggestionTitle}>{item.name}</Text>
+                <Text style={styles.suggestionSubtitle}>
+                  {[item.region, item.country].filter(Boolean).join(', ')}
+                </Text>
+              </Pressable>
+            )}
+          />
+        </View>
+      )}
+
+      {showPermissionCta ? (
+        <Pressable
+          onPress={onPermissionPress}
+          style={styles.permissionButton}
+          accessibilityRole="button"
+          accessibilityLabel="Request location permission"
+        >
+          <Text style={styles.permissionButtonText}>Request Location Permission</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -86,6 +132,28 @@ const styles = StyleSheet.create({
   topBar: {
     width: '100%',
     backgroundColor: '#ddd',
+  },
+  suggestionsContainer: {
+    backgroundColor: '#fff',
+    maxHeight: 180,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  suggestionItem: {
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  suggestionTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#222',
+  },
+  suggestionSubtitle: {
+    marginTop: 2,
+    fontSize: 12,
+    color: '#666',
   },
   searchGroup: {
     flexDirection: 'row',
@@ -107,5 +175,22 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderLeftWidth: 1,
     borderLeftColor: '#ccc',
+  },
+  geoButtonDisabled: {
+    opacity: 0.7,
+  },
+  permissionButton: {
+    marginTop: 8,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#bbb',
+    borderRadius: 8,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  permissionButtonText: {
+    color: '#1f2937',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
