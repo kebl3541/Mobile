@@ -240,6 +240,7 @@ export default function WeatherTabsScreen() {
     cancelPendingSearch,
     setGeocodingError,
     error: geocodingError,
+    reverseGeocodeCoordinates,
   } = useGeocoding();
   const {
     forecast,
@@ -278,6 +279,15 @@ export default function WeatherTabsScreen() {
     });
   };
 
+  const resolveLocationLabelFromCoords = async (coords) => {
+    const place = await reverseGeocodeCoordinates({
+      latitude: coords.latitude,
+      longitude: coords.longitude,
+    });
+
+    return buildResolvedLocationLabel(place, coords.latitude, coords.longitude);
+  };
+
   const setInvalidCityState = (message) => {
     submitText('');
     clearForecast();
@@ -298,8 +308,14 @@ export default function WeatherTabsScreen() {
       return { match: null, isConnectionLost: true };
     }
 
+    if (!searchResults || searchResults.length === 0) {
+      return { match: null, isConnectionLost: false };
+    }
+
+    const exactMatchFromResults = searchResults.find((place) => isExactCityMatch(place, query));
+
     return {
-      match: searchResults?.find((place) => isExactCityMatch(place, query)) || null,
+      match: exactMatchFromResults || searchResults[0],
       isConnectionLost: false,
     };
   };
@@ -367,10 +383,11 @@ export default function WeatherTabsScreen() {
 
     setGeocodingError('');
     submitText('');
+    const locationLabel = await resolveLocationLabelFromCoords(coordsToUse);
     await fetchForecast({
       latitude: coordsToUse.latitude,
       longitude: coordsToUse.longitude,
-      locationLabel: `Currently ${formatCoordinates(coordsToUse)}`,
+      locationLabel,
     });
   };
 
@@ -382,15 +399,16 @@ export default function WeatherTabsScreen() {
     const loadFromLocation = async () => {
       submitText('');
       setGeocodingError('');
+      const locationLabel = await resolveLocationLabelFromCoords(location);
       await fetchForecast({
         latitude: location.latitude,
         longitude: location.longitude,
-        locationLabel: `Currently ${formatCoordinates(location)}`,
+        locationLabel,
       });
     };
 
     loadFromLocation();
-  }, [location, fetchForecast, setGeocodingError, submitText]);
+  }, [location, fetchForecast, setGeocodingError, submitText, reverseGeocodeCoordinates]);
 
   const renderScene = ({ route }) => {
     let extraText = '';

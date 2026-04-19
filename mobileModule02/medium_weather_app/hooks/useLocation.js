@@ -47,19 +47,18 @@ export function useLocation() {
         return webCoords;
       }
 
-      // STEP 1 - Check current permission state, then request if the OS allows asking again.
-      const existingPermission = await Location.getForegroundPermissionsAsync();
-      let permissionStatus = existingPermission.status;
-      const canAskAgain = existingPermission.canAskAgain;
-
-      if (permissionStatus !== 'granted' && canAskAgain) {
-        const requestedPermission = await Location.requestForegroundPermissionsAsync();
-        permissionStatus = requestedPermission.status;
-      }
+// STEP 1 - Request foreground location permission.
+        const permissionResponse = await Location.requestForegroundPermissionsAsync();
+        const permissionStatus = permissionResponse.status;
+        const canAskAgain = permissionResponse.canAskAgain;
 
       // If permission is denied...
       if (permissionStatus !== 'granted') {
-        setErrorMsg('Geolocation is not available, please enable it in your App settings');
+        if (!canAskAgain) {
+          setErrorMsg('Location permission is blocked. Please enable it in your App settings.');
+        } else {
+          setErrorMsg('Geolocation is not available, please enable it in your App settings');
+        }
         setLocation(null); // Clear coordinates 
         return null;
       }

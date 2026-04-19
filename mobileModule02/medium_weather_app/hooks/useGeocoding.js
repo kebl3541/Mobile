@@ -129,6 +129,39 @@ export function useGeocoding() {
             setLoading(false);
         }
     }, []);
+
+    const reverseGeocode = useCallback(async ({ latitude, longitude }) => {
+        if (latitude == null || longitude == null) {
+            return null;
+        }
+
+        try {
+            const response = await fetch(
+                `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}&language=en&format=json`
+            );
+
+            if (!response.ok) {
+                return null;
+            }
+
+            const data = await response.json();
+            const firstMatch = data?.results?.[0];
+
+            if (!firstMatch) {
+                return null;
+            }
+
+            return {
+                name: firstMatch.name,
+                region: firstMatch.admin1 || '',
+                country: firstMatch.country || '',
+                latitude,
+                longitude,
+            };
+        } catch (err) {
+            return null;
+        }
+    }, []);
     
     // Debounced input handler
     useEffect(() => {
@@ -161,6 +194,7 @@ export function useGeocoding() {
         clearSuggestions,
         setGeocodingError: setError,
         searchCities: fetchSuggestions,
+        reverseGeocodeCoordinates: reverseGeocode,
         suppressNextSearch,
         cancelPendingSearch,
     };
