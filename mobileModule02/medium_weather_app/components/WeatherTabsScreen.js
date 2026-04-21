@@ -267,12 +267,6 @@ export default function WeatherTabsScreen() {
   } = useLocation();
 
   const responsive = getResponsiveSizes(width, height);
-  const showPermissionCta =
-    Platform.OS === 'web' &&
-    !location &&
-    !forecast &&
-    !submittedText &&
-    !locationLoading;
 
   const loadForecastForPlace = async (place) => {
     const label = buildLocationLabel(place);
@@ -382,8 +376,10 @@ export default function WeatherTabsScreen() {
   };
 
   const handleGeolocationPress = async () => {
-    clearLocationError();
     clearSuggestions({ clearError: false });
+    setSearchInput('');
+    submitText('');
+    clearForecast();
 
     const previousLocation = location;
     const freshLocation = await getLocation();
@@ -391,14 +387,12 @@ export default function WeatherTabsScreen() {
 
     if (!coordsToUse) {
       if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-        clearLocationError();
         setGeocodingError(connectionLostMessage);
       }
       return;
     }
 
     setGeocodingError('');
-    submitText('');
     const resolvedLabel = freshLocation?.label || (await resolveLocationLabelFromCoords(coordsToUse));
     await fetchForecast({
       latitude: coordsToUse.latitude,
@@ -489,8 +483,6 @@ export default function WeatherTabsScreen() {
         geolocationLoading={locationLoading}
         suggestions={suggestions}
         onSuggestionPress={handleSuggestionPress}
-        showPermissionCta={showPermissionCta}
-        onPermissionPress={handleGeolocationPress}
         responsive={responsive}
       />
 

@@ -18,8 +18,6 @@ export default function TopBar({
   geolocationLoading,
   suggestions,
   onSuggestionPress,
-  showPermissionCta,
-  onPermissionPress,
   responsive,
 }) {
   const {
@@ -138,17 +136,6 @@ export default function TopBar({
           />
         </View>
       )}
-
-      {showPermissionCta ? (
-        <Pressable
-          onPress={onPermissionPress}
-          style={styles.permissionButton}
-          accessibilityRole="button"
-          accessibilityLabel="Request location permission"
-        >
-          <Text style={styles.permissionButtonText}>Request Location Permission</Text>
-        </Pressable>
-      ) : null}
     </View>
   );
 }
@@ -218,19 +205,5 @@ const styles = StyleSheet.create({
   },
   geoButtonDisabled: {
     opacity: 0.7,
-  },
-  permissionButton: {
-    marginTop: 8,
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#bbb',
-    borderRadius: 8,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  permissionButtonText: {
-    color: '#1f2937',
-    fontSize: 14,
-    fontWeight: '600',
   },
 });
