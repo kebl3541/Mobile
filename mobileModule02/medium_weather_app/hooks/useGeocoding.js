@@ -1,6 +1,8 @@
 // Fetch city suggestions from Open-Meteo 
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { Platform } from 'react-native';
+import * as Location from 'expo-location';
 
 export function useGeocoding() {
 
@@ -56,7 +58,7 @@ export function useGeocoding() {
     const fetchSuggestions = useCallback(async (query) => {
         const normalizedQuery = normalizeText(query);
 
-        if (normalizedQuery.length < 2) {   
+        if (normalizedQuery.length < 1) {   
             setSuggestions([]);
             return;
         }
@@ -136,25 +138,21 @@ export function useGeocoding() {
         }
 
         try {
-            const response = await fetch(
-                `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${encodeURIComponent(latitude)}&longitude=${encodeURIComponent(longitude)}&language=en&format=json`
-            );
-
-            if (!response.ok) {
+            if (Platform.OS === 'web' || typeof Location.reverseGeocodeAsync !== 'function') {
                 return null;
             }
 
-            const data = await response.json();
-            const firstMatch = data?.results?.[0];
+            const results = await Location.reverseGeocodeAsync({ latitude, longitude });
+            const firstResult = results?.[0];
 
-            if (!firstMatch) {
+            if (!firstResult) {
                 return null;
             }
 
             return {
-                name: firstMatch.name,
-                region: firstMatch.admin1 || '',
-                country: firstMatch.country || '',
+                name: firstResult.city || firstResult.locality || firstResult.name || '',
+                region: firstResult.region || firstResult.district || firstResult.subregion || '',
+                country: firstResult.country || '',
                 latitude,
                 longitude,
             };

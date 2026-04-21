@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { TabBar } from 'react-native-tab-view';
 
 export default function BottomBar(props) {
-  const { responsive, ...tabBarProps } = props;
+  const { responsive, pointerEvents: _ignoredPointerEvents, ...tabBarProps } = props;
   const { bottomBarPad } = responsive;
 
   return (

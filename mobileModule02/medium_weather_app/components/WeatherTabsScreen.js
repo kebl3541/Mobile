@@ -15,10 +15,16 @@ import { renderWeatherTabIcon, weatherTabs } from '../constants/weatherTabs';
 import { useLocation } from '../hooks/useLocation';
 
 function buildLocationLabel(place) {
-  return [place?.name, place?.region, place?.country].filter(Boolean).join(', ');
+  const parts = [place?.name, place?.region, place?.country]
+    .map((part) => (part || '').trim())
+    .filter(Boolean)
+    .filter((part, index, array) => array.indexOf(part) === index);
+
+  return parts.join(', ');
 }
 
 const connectionLostMessage = 'The service connection is lost, please check your internet connection or try again later';
+const emptySearchMessage = 'Please enter a city name to search.';
 
 function normalizeText(value) {
   return (value || '').trim().toLowerCase().replace(/\s+/g, ' ');
@@ -41,11 +47,13 @@ function isExactCityMatch(place, query) {
 }
 
 function buildResolvedLocationLabel(place, latitude, longitude) {
+  const cityName = (place?.name || place?.city || '').trim();
+
   return buildLocationLabel({
-    name: place?.name || place?.city || 'Current location',
-    region: place?.admin1 || place?.region || '',
+    name: cityName,
+    region: cityName ? '' : (place?.admin1 || place?.region || ''),
     country: place?.country || '',
-  }) || `Lat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}`;
+  }) || '';
 }
 
 function formatHour(time) {
@@ -74,7 +82,7 @@ function formatDate(date) {
   });
 }
 
-function buildCurrentText(forecast, submittedText, location, geocodingError, forecastLoading, forecastError, locationLoading, locationError) {
+function buildCurrentText(forecast, submittedText, location, locationLabel, geocodingError, forecastLoading, forecastError, locationLoading, locationError) {
   if (locationLoading && !forecast && !submittedText) {
     return 'Fetching location...';
   }
@@ -105,19 +113,19 @@ function buildCurrentText(forecast, submittedText, location, geocodingError, for
     }
 
     if (location) {
-      return `Currently ${formatCoordinates(location)}`;
+      return locationLabel || formatCoordinates(location);
     }
 
     return 'Search for a city to see weather.';
   }
 
   if (!forecast.current) {
-    return `${forecast.location}\nCurrent weather data is not available.`;
+    return `${forecast.location || locationLabel || submittedText || formatCoordinates(location)}\nCurrent weather data is not available.`;
   }
 
   return [
     `LOCATION`,
-    `${forecast.location}`,
+    `${forecast.location || locationLabel || submittedText || formatCoordinates(location)}`,
     '',
     `TEMPERATURE`,
     `${forecast.current.temperature} °C`,
@@ -130,7 +138,7 @@ function buildCurrentText(forecast, submittedText, location, geocodingError, for
   ].join('\n');
 }
 
-function buildTodayText(forecast, submittedText, geocodingError, forecastLoading, forecastError, locationLoading, locationError) {
+function buildTodayText(forecast, submittedText, location, locationLabel, geocodingError, forecastLoading, forecastError, locationLoading, locationError) {
   if (locationLoading && !forecast && !submittedText) {
     return 'Fetching location...';
   }
@@ -156,7 +164,7 @@ function buildTodayText(forecast, submittedText, geocodingError, forecastLoading
   }
 
   if (!forecast) {
-    return submittedText || 'Search for a city to see today\'s weather.';
+    return submittedText || locationLabel || 'Search for a city to see today\'s weather.';
   }
 
   const items = (forecast.hourly || []).slice(0, 24).map((item) => (
@@ -165,13 +173,13 @@ function buildTodayText(forecast, submittedText, geocodingError, forecastLoading
 
   return [
     `LOCATION`,
-    `${forecast.location}`,
+    `${forecast.location || locationLabel || submittedText || formatCoordinates(location)}`,
     '',
     ...(items.length > 0 ? items.flatMap((item) => [item, '']) : ['No hourly weather data available.']),
   ].join('\n');
 }
 
-function buildWeeklyText(forecast, submittedText, geocodingError, forecastLoading, forecastError, locationLoading, locationError) {
+function buildWeeklyText(forecast, submittedText, location, locationLabel, geocodingError, forecastLoading, forecastError, locationLoading, locationError) {
   if (locationLoading && !forecast && !submittedText) {
     return 'Fetching location...';
   }
@@ -197,7 +205,7 @@ function buildWeeklyText(forecast, submittedText, geocodingError, forecastLoadin
   }
 
   if (!forecast) {
-    return submittedText || 'Search for a city to see weekly weather.';
+    return submittedText || locationLabel || 'Search for a city to see weekly weather.';
   }
 
   const items = (forecast.daily || []).slice(0, 7).map((item) => (
@@ -206,7 +214,7 @@ function buildWeeklyText(forecast, submittedText, geocodingError, forecastLoadin
 
   return [
     `LOCATION`,
-    `${forecast.location}`,
+    `${forecast.location || locationLabel || submittedText || formatCoordinates(location)}`,
     '',
     ...(items.length > 0 ? items.flatMap((item) => [item, '']) : ['No weekly weather data available.']),
   ].join('\n');
@@ -251,6 +259,7 @@ export default function WeatherTabsScreen() {
   } = useWeatherForecast();
   const {
     location,
+    locationLabel,
     errorMsg: locationError,
     loading: locationLoading,
     getLocation,
@@ -280,6 +289,10 @@ export default function WeatherTabsScreen() {
   };
 
   const resolveLocationLabelFromCoords = async (coords) => {
+    if (locationLabel) {
+      return locationLabel;
+    }
+
     const place = await reverseGeocodeCoordinates({
       latitude: coords.latitude,
       longitude: coords.longitude,
@@ -335,7 +348,10 @@ export default function WeatherTabsScreen() {
         return;
       }
 
-      setInvalidCityState('Could not find any result for the supplied address or coordinates');
+      submitText('');
+      clearForecast();
+      setGeocodingError(emptySearchMessage);
+      clearSuggestions({ clearError: false });
       return;
     }
 
@@ -371,7 +387,7 @@ export default function WeatherTabsScreen() {
 
     const previousLocation = location;
     const freshLocation = await getLocation();
-    const coordsToUse = freshLocation || previousLocation;
+    const coordsToUse = freshLocation?.coords || previousLocation;
 
     if (!coordsToUse) {
       if (typeof navigator !== 'undefined' && navigator.onLine === false) {
@@ -383,11 +399,11 @@ export default function WeatherTabsScreen() {
 
     setGeocodingError('');
     submitText('');
-    const locationLabel = await resolveLocationLabelFromCoords(coordsToUse);
+    const resolvedLabel = freshLocation?.label || (await resolveLocationLabelFromCoords(coordsToUse));
     await fetchForecast({
       latitude: coordsToUse.latitude,
       longitude: coordsToUse.longitude,
-      locationLabel,
+      locationLabel: resolvedLabel,
     });
   };
 
@@ -399,16 +415,16 @@ export default function WeatherTabsScreen() {
     const loadFromLocation = async () => {
       submitText('');
       setGeocodingError('');
-      const locationLabel = await resolveLocationLabelFromCoords(location);
+      const resolvedLabel = await resolveLocationLabelFromCoords(location);
       await fetchForecast({
         latitude: location.latitude,
         longitude: location.longitude,
-        locationLabel,
+        locationLabel: resolvedLabel,
       });
     };
 
     loadFromLocation();
-  }, [location, fetchForecast, setGeocodingError, submitText, reverseGeocodeCoordinates]);
+  }, [location, locationLabel, fetchForecast, setGeocodingError, submitText, reverseGeocodeCoordinates]);
 
   const renderScene = ({ route }) => {
     let extraText = '';
@@ -418,6 +434,7 @@ export default function WeatherTabsScreen() {
         forecast,
         submittedText,
         location,
+        locationLabel,
         geocodingError,
         forecastLoading,
         forecastError,
@@ -428,6 +445,8 @@ export default function WeatherTabsScreen() {
       extraText = buildTodayText(
         forecast,
         submittedText,
+        location,
+        locationLabel,
         geocodingError,
         forecastLoading,
         forecastError,
@@ -438,6 +457,8 @@ export default function WeatherTabsScreen() {
       extraText = buildWeeklyText(
         forecast,
         submittedText,
+        location,
+        locationLabel,
         geocodingError,
         forecastLoading,
         forecastError,

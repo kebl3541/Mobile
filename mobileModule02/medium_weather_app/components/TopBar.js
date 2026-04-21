@@ -51,6 +51,24 @@ export default function TopBar({
           },
         ]}
       >
+        <Pressable
+          onPress={onSubmitEditing}
+          style={[
+            styles.searchButton,
+            {
+              width: controlHeight,
+            },
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel="Search location"
+        >
+          <Ionicons
+            name="search-outline"
+            size={topBarIcon}
+            color="#444"
+          />
+        </Pressable>
+
         <TextInput
           value={inputText}
           onChangeText={setInputText}
@@ -94,9 +112,16 @@ export default function TopBar({
       </View>
 
       {suggestions.length > 0 && (
-        <View style={styles.suggestionsContainer}>
+        <View
+          style={[
+            styles.suggestionsContainer,
+            {
+              top: topBarPadV + controlHeight,
+            },
+          ]}
+        >
           <FlatList
-            keyboardShouldPersistTaps="handled"
+            keyboardShouldPersistTaps="always"
             data={suggestions}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
@@ -132,12 +157,19 @@ const styles = StyleSheet.create({
   topBar: {
     width: '100%',
     backgroundColor: '#ddd',
+    position: 'relative',
+    zIndex: 10,
   },
   suggestionsContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
     backgroundColor: '#fff',
     maxHeight: 180,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
+    zIndex: 30,
+    elevation: 30,
   },
   suggestionItem: {
     paddingHorizontal: 14,
@@ -175,6 +207,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderLeftWidth: 1,
     borderLeftColor: '#ccc',
+  },
+  searchButton: {
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
+    borderRightWidth: 1,
+    borderRightColor: '#ccc',
   },
   geoButtonDisabled: {
     opacity: 0.7,
