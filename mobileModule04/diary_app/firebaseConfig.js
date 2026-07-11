@@ -1,12 +1,12 @@
 // Fill these values from your Firebase console (see SETUP.md).
 // Project settings > General > Your apps > Web app > SDK setup and configuration.
 export const firebaseConfig = {
-  apiKey: 'YOUR_API_KEY',
-  authDomain: 'YOUR_PROJECT_ID.firebaseapp.com',
-  projectId: 'YOUR_PROJECT_ID',
-  storageBucket: 'YOUR_PROJECT_ID.firebasestorage.app',
-  messagingSenderId: 'YOUR_SENDER_ID',
-  appId: 'YOUR_APP_ID',
+  apiKey: 'AIzaSy_REVOKED_AND_ROTATED',
+  authDomain: 'diary-22d66.firebaseapp.com',
+  projectId: 'diary-22d66',
+  storageBucket: 'diary-22d66.firebasestorage.app',
+  messagingSenderId: '740146262268',
+  appId: '1:740146262268:web:d1c5dee51bedd061d76779',
 };
 
 // Only needed to sign in from a NATIVE build (Android/iOS).
