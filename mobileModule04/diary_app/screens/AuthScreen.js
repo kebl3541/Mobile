@@ -11,6 +11,7 @@ import {
 
 import { signInWithGoogleWeb, signInWithGithubWeb, isWeb } from '../services/authService';
 import { useNativeGoogleAuth, useNativeGithubAuth } from '../hooks/useNativeAuth';
+import { isFirebaseConfigured } from '../firebaseConfig';
 import { COLORS, SPACING, RADIUS } from '../constants/theme';
 
 function showError(error) {
@@ -37,6 +38,10 @@ export default function AuthScreen() {
   const githubNative = useNativeGithubAuth(onError);
 
   const handleGoogle = async () => {
+    if (!isFirebaseConfigured) {
+      showError(new Error('Firebase is not configured: fill in firebaseConfig.js (see SETUP.md).'));
+      return;
+    }
     setBusy(true);
     try {
       if (isWeb) {
@@ -50,6 +55,10 @@ export default function AuthScreen() {
   };
 
   const handleGithub = async () => {
+    if (!isFirebaseConfigured) {
+      showError(new Error('Firebase is not configured: fill in firebaseConfig.js (see SETUP.md).'));
+      return;
+    }
     setBusy(true);
     try {
       if (isWeb) {
@@ -87,6 +96,13 @@ export default function AuthScreen() {
             <Text style={styles.providerText}>Continue with GitHub</Text>
           </TouchableOpacity>
         </>
+      )}
+
+      {!isFirebaseConfigured && (
+        <Text style={styles.warning}>
+          Firebase is not configured yet.{'\n'}
+          Sign-in will not work until firebaseConfig.js is filled in (see SETUP.md).
+        </Text>
       )}
     </View>
   );
@@ -130,5 +146,11 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  warning: {
+    marginTop: SPACING.xl,
+    color: COLORS.danger,
+    textAlign: 'center',
+    fontSize: 13,
   },
 });
