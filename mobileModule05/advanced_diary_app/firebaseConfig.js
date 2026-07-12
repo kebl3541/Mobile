@@ -1,5 +1,10 @@
 // Fill these values from your Firebase console (see SETUP.md).
 // Project settings > General > Your apps > Web app > SDK setup and configuration.
+// NOTE: this apiKey is a Firebase *web app identifier*, public by design
+// (it ships in every deployed Firebase web app). It is NOT an access secret:
+// data access is enforced by Firestore security rules and Firebase Auth, and
+// the key itself is API-restricted in Google Cloud to only the services this
+// app uses (Identity Toolkit, Secure Token, Firestore, Installations).
 export const firebaseConfig = {
   apiKey: 'AIzaSy_REVOKED_AND_ROTATED',
   authDomain: 'diary-22d66.firebaseapp.com',
@@ -20,6 +25,9 @@ export const googleNativeConfig = {
 
 export const githubNativeConfig = {
   // GitHub OAuth app credentials (github.com/settings/developers).
+  // WARNING: unlike the Firebase apiKey above, a GitHub client secret IS a
+  // real secret. Never commit a real value here — for native GitHub login,
+  // load it from an untracked local file instead.
   clientId: 'YOUR_GITHUB_CLIENT_ID',
   clientSecret: 'YOUR_GITHUB_CLIENT_SECRET',
 };
