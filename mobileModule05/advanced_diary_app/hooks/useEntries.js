@@ -1,23 +1,8 @@
-import { useEffect, useState } from 'react';
-
-import { useAuth } from '../context/AuthContext';
-import { subscribeToEntries } from '../services/diaryService';
+import { useEntriesContext } from '../context/EntriesContext';
 
 // Live entries for the signed-in user, shared by Profile and Agenda.
-// null while the first snapshot is loading.
+// null while the first snapshot is loading. Backed by the single
+// subscription in EntriesProvider.
 export function useEntries() {
-  const { user } = useAuth();
-  const [entries, setEntries] = useState(null);
-
-  useEffect(() => {
-    if (!user?.email) return undefined;
-    const unsubscribe = subscribeToEntries(
-      user.email,
-      setEntries,
-      (error) => console.error('Entries subscription error:', error)
-    );
-    return unsubscribe;
-  }, [user?.email]);
-
-  return entries;
+  return useEntriesContext();
 }

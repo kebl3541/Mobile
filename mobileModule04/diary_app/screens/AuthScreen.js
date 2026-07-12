@@ -5,24 +5,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Alert,
-  Platform,
 } from 'react-native';
 
 import { signInWithGoogleWeb, signInWithGithubWeb, isWeb } from '../services/authService';
 import { useNativeGoogleAuth, useNativeGithubAuth } from '../hooks/useNativeAuth';
 import { isFirebaseConfigured } from '../firebaseConfig';
+import { showError } from '../utils/alert';
 import { COLORS, SPACING, RADIUS } from '../constants/theme';
-
-function showError(error) {
-  const message = error?.message ?? String(error);
-  if (Platform.OS === 'web') {
-    // eslint-disable-next-line no-alert
-    window.alert(message);
-  } else {
-    Alert.alert('Sign-in failed', message);
-  }
-}
 
 // Ex00: the authentication page. Google or GitHub sign-in; once
 // Firebase reports a user, App.js swaps the stack to the diary.
@@ -31,45 +20,37 @@ export default function AuthScreen() {
 
   const onError = (error) => {
     setBusy(false);
-    showError(error);
+    showError('Sign-in failed', error);
   };
 
   const googleNative = useNativeGoogleAuth(onError);
   const githubNative = useNativeGithubAuth(onError);
 
-  const handleGoogle = async () => {
+  // One flow for both providers. On native, promptAsync RESOLVES (never
+  // throws) with type 'dismiss'/'cancel' when the user backs out of the
+  // OAuth browser, so busy must be reset on any non-success result.
+  const handleSignIn = async (webSignIn, nativeAuth) => {
     if (!isFirebaseConfigured) {
-      showError(new Error('Firebase is not configured: create a .env file (see SETUP.md).'));
+      showError('Sign-in failed', new Error('Firebase is not configured: create a .env file (see SETUP.md).'));
       return;
     }
     setBusy(true);
     try {
       if (isWeb) {
-        await signInWithGoogleWeb();
+        await webSignIn();
       } else {
-        await googleNative.promptAsync();
+        const result = await nativeAuth.promptAsync();
+        if (result?.type !== 'success') {
+          setBusy(false);
+        }
       }
     } catch (error) {
       onError(error);
     }
   };
 
-  const handleGithub = async () => {
-    if (!isFirebaseConfigured) {
-      showError(new Error('Firebase is not configured: create a .env file (see SETUP.md).'));
-      return;
-    }
-    setBusy(true);
-    try {
-      if (isWeb) {
-        await signInWithGithubWeb();
-      } else {
-        await githubNative.promptAsync();
-      }
-    } catch (error) {
-      onError(error);
-    }
-  };
+  const handleGoogle = () => handleSignIn(signInWithGoogleWeb, googleNative);
+  const handleGithub = () => handleSignIn(signInWithGithubWeb, githubNative);
 
   return (
     <View style={styles.container}>

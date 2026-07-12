@@ -4,7 +4,7 @@
     "slug": "advanced_diary_app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "diaryapp",
+    "scheme": "advanceddiaryapp",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -12,10 +12,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.kebl3541.diaryapp"
+      "bundleIdentifier": "com.kebl3541.advanceddiaryapp"
     },
     "android": {
-      "package": "com.kebl3541.diaryapp",
+      "package": "com.kebl3541.advanceddiaryapp",
       "edgeToEdgeEnabled": true
     },
     "web": {

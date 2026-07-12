@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 
 import { FEELINGS } from '../constants/feelings';
+import { showError } from '../utils/alert';
 import { COLORS, SPACING, RADIUS } from '../constants/theme';
 
 export default function NewEntryModal({ visible, onSubmit, onClose }) {
@@ -38,7 +39,7 @@ export default function NewEntryModal({ visible, onSubmit, onClose }) {
       await onSubmit({ title: title.trim(), feeling, text: text.trim() });
       reset();
     } catch (error) {
-      console.error('Create entry failed:', error);
+      showError('Could not save the entry', error);
       setSaving(false);
     }
   };

@@ -1,11 +1,24 @@
 rules_version = '2';
+// NOTE: an identical twin of this file exists in the other module
+// (mobileModule04/diary_app <-> mobileModule05/advanced_diary_app).
+// Both apps use the SAME Firebase project, so whichever copy is deployed
+// last wins. Keep the two files in sync.
 service cloud.firestore {
   match /databases/{database}/documents {
     match /entries/{entryId} {
       allow read, delete: if request.auth != null
         && resource.data.usermail == request.auth.token.email;
       allow create: if request.auth != null
-        && request.resource.data.usermail == request.auth.token.email;
+        && request.resource.data.usermail == request.auth.token.email
+        && request.resource.data.keys().hasOnly(['usermail', 'date', 'title', 'feeling', 'text'])
+        && request.resource.data.date is timestamp
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 200
+        && request.resource.data.feeling in ['very_happy', 'happy', 'neutral', 'sad', 'angry']
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 20000;
     }
   }
 }

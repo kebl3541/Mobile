@@ -41,7 +41,7 @@ export function useNativeGoogleAuth(onError) {
 }
 
 export function useNativeGithubAuth(onError) {
-  const redirectUri = makeRedirectUri({ scheme: 'diaryapp' });
+  const redirectUri = makeRedirectUri({ scheme: 'advanceddiaryapp' });
   const [request, response, promptAsync] = useAuthRequest(
     {
       clientId: githubNativeConfig.clientId,

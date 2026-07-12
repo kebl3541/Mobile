@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { EntriesProvider } from './context/EntriesContext';
 import LoginScreen from './screens/LoginScreen';
 import AuthScreen from './screens/AuthScreen';
 import ProfileScreen from './screens/ProfileScreen';
@@ -20,9 +21,11 @@ function TabIcon({ emoji, focused }) {
   return <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.45 }}>{emoji}</Text>;
 }
 
-// Logged-in area: Profile and Agenda as bottom tabs.
+// Logged-in area: Profile and Agenda as bottom tabs, sharing one live
+// entries subscription via EntriesProvider.
 function HomeTabs() {
   return (
+    <EntriesProvider>
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
@@ -46,6 +49,7 @@ function HomeTabs() {
         }}
       />
     </Tab.Navigator>
+    </EntriesProvider>
   );
 }
 

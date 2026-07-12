@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -7,9 +7,11 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
+import { useFocusEffect } from '@react-navigation/native';
 
 import { deleteEntry } from '../services/diaryService';
 import { useEntries } from '../hooks/useEntries';
+import { showError } from '../utils/alert';
 import EntryCard from '../components/EntryCard';
 import EntryDetailModal from '../components/EntryDetailModal';
 import { dateKey, todayKey } from '../utils/format';
@@ -22,6 +24,15 @@ export default function AgendaScreen() {
   const entries = useEntries();
   const [selectedDay, setSelectedDay] = useState(todayKey());
   const [selectedEntry, setSelectedEntry] = useState(null);
+
+  // Tabs keep this screen mounted, so "today" from mount time can go
+  // stale across midnight. Re-select the current date whenever the tab
+  // regains focus, per the subject: the calendar opens on today.
+  useFocusEffect(
+    useCallback(() => {
+      setSelectedDay(todayKey());
+    }, [])
+  );
 
   const entriesByDay = useMemo(() => {
     const map = {};
@@ -47,8 +58,12 @@ export default function AgendaScreen() {
   }, [entriesByDay, selectedDay]);
 
   const handleDelete = async (entry) => {
-    await deleteEntry(entry.id);
-    setSelectedEntry(null);
+    try {
+      await deleteEntry(entry.id);
+      setSelectedEntry(null);
+    } catch (error) {
+      showError('Could not delete the entry', error);
+    }
   };
 
   if (entries === null) {

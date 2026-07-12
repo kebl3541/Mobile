@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,11 +10,9 @@ import {
 
 import { useAuth } from '../context/AuthContext';
 import { signOut } from '../services/authService';
-import {
-  subscribeToEntries,
-  createEntry,
-  deleteEntry,
-} from '../services/diaryService';
+import { createEntry, deleteEntry } from '../services/diaryService';
+import { useEntries } from '../hooks/useEntries';
+import { showError } from '../utils/alert';
 import EntryCard from '../components/EntryCard';
 import NewEntryModal from '../components/NewEntryModal';
 import EntryDetailModal from '../components/EntryDetailModal';
@@ -24,19 +22,9 @@ import { COLORS, SPACING, RADIUS } from '../constants/theme';
 // Firestore; supports create, read (tap a card) and delete.
 export default function ProfileScreen() {
   const { user } = useAuth();
-  const [entries, setEntries] = useState(null);
+  const entries = useEntries();
   const [creating, setCreating] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState(null);
-
-  useEffect(() => {
-    if (!user?.email) return undefined;
-    const unsubscribe = subscribeToEntries(
-      user.email,
-      setEntries,
-      (error) => console.error('Entries subscription error:', error)
-    );
-    return unsubscribe;
-  }, [user?.email]);
 
   const handleCreate = async ({ title, feeling, text }) => {
     await createEntry({ usermail: user.email, title, feeling, text });
@@ -44,8 +32,12 @@ export default function ProfileScreen() {
   };
 
   const handleDelete = async (entry) => {
-    await deleteEntry(entry.id);
-    setSelectedEntry(null);
+    try {
+      await deleteEntry(entry.id);
+      setSelectedEntry(null);
+    } catch (error) {
+      showError('Could not delete the entry', error);
+    }
   };
 
   return (

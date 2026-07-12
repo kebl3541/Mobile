@@ -4,15 +4,36 @@ import { View, Text, StyleSheet } from 'react-native';
 import { FEELINGS } from '../constants/feelings';
 import { COLORS, SPACING, RADIUS } from '../constants/theme';
 
+// Largest-remainder rounding: floor every share, then hand the leftover
+// points to the largest fractional parts so the total is exactly 100.
+function percentages(entries) {
+  const total = entries.length;
+  const counts = FEELINGS.map(
+    (f) => entries.filter((e) => e.feeling === f.key).length
+  );
+  if (total === 0) return counts.map(() => 0);
+  const exact = counts.map((c) => (c / total) * 100);
+  const floored = exact.map(Math.floor);
+  let leftover = 100 - floored.reduce((a, b) => a + b, 0);
+  const order = exact
+    .map((v, i) => ({ frac: v - floored[i], i }))
+    .sort((a, b) => b.frac - a.frac);
+  for (const { i } of order) {
+    if (leftover <= 0) break;
+    floored[i] += 1;
+    leftover -= 1;
+  }
+  return floored;
+}
+
 // Percentage of use of each feeling across all entries.
 export default function FeelingStats({ entries }) {
-  const total = entries.length;
+  const pcts = percentages(entries);
 
   return (
     <View style={styles.container}>
-      {FEELINGS.map((f) => {
-        const count = entries.filter((e) => e.feeling === f.key).length;
-        const pct = total === 0 ? 0 : Math.round((count / total) * 100);
+      {FEELINGS.map((f, idx) => {
+        const pct = pcts[idx];
         return (
           <View key={f.key} style={styles.row}>
             <Text style={styles.emoji}>{f.emoji}</Text>

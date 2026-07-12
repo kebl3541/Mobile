@@ -11,6 +11,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { signOut } from '../services/authService';
 import { createEntry, deleteEntry } from '../services/diaryService';
+import { showError } from '../utils/alert';
 import { useEntries } from '../hooks/useEntries';
 import EntryCard from '../components/EntryCard';
 import FeelingStats from '../components/FeelingStats';
@@ -36,8 +37,12 @@ export default function ProfileScreen() {
   };
 
   const handleDelete = async (entry) => {
-    await deleteEntry(entry.id);
-    setSelectedEntry(null);
+    try {
+      await deleteEntry(entry.id);
+      setSelectedEntry(null);
+    } catch (error) {
+      showError('Could not delete the entry', error);
+    }
   };
 
   if (entries === null) {

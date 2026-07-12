@@ -77,10 +77,10 @@ variables in your local `.env`:
 
 - **Google client IDs**: Google Cloud console > APIs & Services >
   Credentials (Firebase already created a Web client; add Android/iOS
-  clients with the package name `com.kebl3541.diaryapp`).
+  clients with the package name `com.kebl3541.advanceddiaryapp`).
 - **GitHub**: reuse the OAuth app from step 4, but GitHub OAuth apps only
   allow one callback URL. Create a second OAuth app with callback
-  `diaryapp://` for native, and put its ID/secret in `githubNativeConfig`.
+  `advanceddiaryapp://` for native, and put its ID/secret in `githubNativeConfig`.
 
 ## 8. For the evaluation
 
