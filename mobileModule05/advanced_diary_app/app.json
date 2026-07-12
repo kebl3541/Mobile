@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "advanced_diary_app",
+    "slug": "advanced_diary_app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "diaryapp",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#F6F1E7"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.kebl3541.diaryapp"
+    },
+    "android": {
+      "package": "com.kebl3541.diaryapp",
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
