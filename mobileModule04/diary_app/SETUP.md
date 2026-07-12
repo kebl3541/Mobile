@@ -12,9 +12,9 @@ point-and-click in the browser.
 
 1. In the project overview, click the **`</>` (Web)** icon to add a web app.
 2. Nickname: `diary_app`. No hosting needed.
-3. Copy the `firebaseConfig` object it shows you into
-   [firebaseConfig.js](firebaseConfig.js) (apiKey, authDomain, projectId,
-   storageBucket, messagingSenderId, appId).
+3. Copy `.env.example` to `.env` and fill in the values it shows you
+   (apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId).
+   `.env` is gitignored on purpose - never commit it.
 
 ## 3. Enable Google sign-in
 
@@ -72,8 +72,8 @@ Authorized domains** includes `localhost` (it does by default).
 ## 7. Native builds only (optional for now)
 
 Web needs nothing beyond the steps above. To sign in from an Android/iOS
-build, additionally fill in `googleNativeConfig` and `githubNativeConfig`
-in [firebaseConfig.js](firebaseConfig.js):
+build, additionally fill in the EXPO_PUBLIC_GOOGLE_*/EXPO_PUBLIC_GITHUB_*
+variables in your local `.env`:
 
 - **Google client IDs**: Google Cloud console > APIs & Services >
   Credentials (Firebase already created a Web client; add Android/iOS

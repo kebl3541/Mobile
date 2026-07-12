@@ -24,7 +24,7 @@ export default function LoginScreen({ navigation }) {
       {!isFirebaseConfigured && (
         <Text style={styles.warning}>
           Firebase is not configured yet.{'\n'}
-          Fill in firebaseConfig.js (see SETUP.md).
+          Create a .env file (see SETUP.md).
         </Text>
       )}
     </View>

@@ -39,7 +39,7 @@ export default function AuthScreen() {
 
   const handleGoogle = async () => {
     if (!isFirebaseConfigured) {
-      showError(new Error('Firebase is not configured: fill in firebaseConfig.js (see SETUP.md).'));
+      showError(new Error('Firebase is not configured: create a .env file (see SETUP.md).'));
       return;
     }
     setBusy(true);
@@ -56,7 +56,7 @@ export default function AuthScreen() {
 
   const handleGithub = async () => {
     if (!isFirebaseConfigured) {
-      showError(new Error('Firebase is not configured: fill in firebaseConfig.js (see SETUP.md).'));
+      showError(new Error('Firebase is not configured: create a .env file (see SETUP.md).'));
       return;
     }
     setBusy(true);
@@ -101,7 +101,7 @@ export default function AuthScreen() {
       {!isFirebaseConfigured && (
         <Text style={styles.warning}>
           Firebase is not configured yet.{'\n'}
-          Sign-in will not work until firebaseConfig.js is filled in (see SETUP.md).
+          Sign-in will not work until .env is created (see SETUP.md).
         </Text>
       )}
     </View>
